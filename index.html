@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Portfolio</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Sora', 'sans-serif'],
+          },
+          colors: {
+            ink: '#0f0f0f',
+            muted: '#6b7280',
+            accent: '#2563eb',
+            'accent-light': '#eff6ff',
+            surface: '#f9fafb',
+            card: '#ffffff',
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.5s ease forwards',
+          },
+          keyframes: {
+            fadeUp: {
+              from: { opacity: '0', transform: 'translateY(16px)' },
+              to:   { opacity: '1', transform: 'translateY(0)' },
+            },
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:#f9fafb;color:#0f0f0f;font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    :focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/* ============================================================
+   ✏️  CONFIG — edit this object to update your portfolio.
+   Push to GitHub → Vercel auto-deploys in ~30 sec.
+   ============================================================ */
+const CONFIG = {
+  name: "Alex Rivera",
+  title: "Full-Stack Developer",
+  tagline: "I build reliable, fast web products — from API to interface.",
+  avatar: "", /* URL to your photo, or leave "" for initials */
+  location: "San Francisco, CA",
+  openToWork: true,
+
+  contact: {
+    email: "alex@example.com",
+    github: "https://github.com/alexrivera",
+    linkedin: "https://linkedin.com/in/alexrivera",
+    resume: "https://drive.google.com/your-resume-link",
+  },
+
+  skills: ["React", "Node.js", "TypeScript", "PostgreSQL", "Docker", "AWS", "Python", "Redis"],
+
+  /* ── CERTIFICATES ─────────────────────────────────────── */
+  certificates: [
+    {
+      name: "AWS Solutions Architect – Associate",
+      issuer: "Amazon Web Services",
+      date: "Aug 2024",
+      link: "https://www.credly.com/your-badge",
+      icon: "☁️",
+    },
+    {
+      name: "Google Professional Cloud Developer",
+      issuer: "Google Cloud",
+      date: "Mar 2024",
+      link: "https://google.com/your-cert",
+      icon: "🔷",
+    },
+    {
+      name: "Meta Front-End Developer",
+      issuer: "Meta / Coursera",
+      date: "Nov 2023",
+      link: "https://coursera.org/your-cert",
+      icon: "⚛️",
+    },
+  ],
+
+  /* ── PROJECTS ─────────────────────────────────────────── */
+  projects: [
+    {
+      name: "ShipFast API",
+      description: "REST + GraphQL gateway serving 2M requests/day. Built with Node.js, Redis caching, and deployed on AWS ECS with zero-downtime deploys.",
+      tags: ["Node.js", "GraphQL", "Redis", "AWS"],
+      github: "https://github.com/alexrivera/shipfast-api",
+      demo: "https://shipfast.example.com",
+      highlight: true, /* pins as featured */
+    },
+    {
+      name: "Budgetly",
+      description: "Personal finance tracker with real-time bank sync, smart categorisation, and a React Native mobile app. 1,200+ active users.",
+      tags: ["React", "React Native", "PostgreSQL", "Plaid"],
+      github: "https://github.com/alexrivera/budgetly",
+      demo: "https://budgetly.example.com",
+      highlight: false,
+    },
+    {
+      name: "DocSearch",
+      description: "Semantic search over private documents using OpenAI embeddings + pgvector. Deployed as a self-hosted Docker image.",
+      tags: ["Python", "FastAPI", "pgvector", "Docker"],
+      github: "https://github.com/alexrivera/docsearch",
+      demo: "",
+      highlight: false,
+    },
+    {
+      name: "OpenMetrics",
+      description: "Open-source Prometheus dashboard alternative. Lightweight, embeddable, and supports custom alerting rules.",
+      tags: ["TypeScript", "D3.js", "InfluxDB"],
+      github: "https://github.com/alexrivera/openmetrics",
+      demo: "https://openmetrics.dev",
+      highlight: false,
+    },
+  ],
+};
+/* ============================================================ */
+</script>
+
+<script>
+const { useState, useEffect, useRef } = React;
+const e = React.createElement;
+
+/* ── helpers ── */
+const initials = name => name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+
+function ExternalLink({ href, children, className = '' }) {
+  if (!href) return null;
+  return e('a', { href, target:'_blank', rel:'noopener noreferrer', className }, children);
+}
+
+/* ── Nav ── */
+function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
+  return e('header', {
+    className: `fixed top-0 inset-x-0 z-50 transition-all duration-200 ${scrolled ? 'bg-white/90 backdrop-blur border-b border-gray-100 shadow-sm' : ''}`,
+    style: { paddingTop: 'env(safe-area-inset-top,0px)' },
+  },
+    e('nav', { className: 'max-w-4xl mx-auto px-6 h-14 flex items-center justify-between' },
+      e('span', { className: 'font-display font-bold text-ink text-base tracking-tight' }, CONFIG.name),
+      e('div', { className: 'flex items-center gap-5 text-sm font-medium text-muted' },
+        e('a', { href: '#projects', className: 'hover:text-ink transition-colors' }, 'Projects'),
+        e('a', { href: '#certificates', className: 'hover:text-ink transition-colors' }, 'Certificates'),
+        e(ExternalLink, { href: CONFIG.contact.resume, className: 'bg-accent text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors text-xs font-semibold' }, 'Resume ↗'),
+      ),
+    ),
+  );
+}
+
+/* ── Hero ── */
+function Hero() {
+  return e('section', { className: 'pt-32 pb-20 px-6 max-w-4xl mx-auto animate-fade-up' },
+    e('div', { className: 'flex flex-col sm:flex-row items-start gap-8' },
+      /* avatar */
+      e('div', { className: 'shrink-0' },
+        CONFIG.avatar
+          ? e('img', { src: CONFIG.avatar, alt: CONFIG.name, className: 'w-20 h-20 rounded-2xl object-cover ring-1 ring-gray-200' })
+          : e('div', { className: 'w-20 h-20 rounded-2xl bg-accent-light flex items-center justify-center text-accent font-display font-bold text-2xl' }, initials(CONFIG.name)),
+      ),
+      /* text */
+      e('div', null,
+        CONFIG.openToWork && e('span', { className: 'inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 rounded-full px-3 py-1 mb-3' },
+          e('span', { className: 'w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse' }),
+          'Open to work',
+        ),
+        e('h1', { className: 'font-display font-bold text-ink text-3xl sm:text-4xl leading-tight mb-2' }, CONFIG.name),
+        e('p', { className: 'text-accent font-semibold text-lg mb-3' }, CONFIG.title),
+        e('p', { className: 'text-muted text-base leading-relaxed max-w-lg mb-5' }, CONFIG.tagline),
+        e('div', { className: 'flex items-center flex-wrap gap-3' },
+          e(ExternalLink, { href: `mailto:${CONFIG.contact.email}`, className: 'flex items-center gap-1.5 text-sm text-muted hover:text-ink transition-colors' }, '✉ ' + CONFIG.contact.email),
+          CONFIG.contact.github && e(ExternalLink, { href: CONFIG.contact.github, className: 'flex items-center gap-1.5 text-sm text-muted hover:text-ink transition-colors' }, '↗ GitHub'),
+          CONFIG.contact.linkedin && e(ExternalLink, { href: CONFIG.contact.linkedin, className: 'flex items-center gap-1.5 text-sm text-muted hover:text-ink transition-colors' }, '↗ LinkedIn'),
+        ),
+      ),
+    ),
+    /* skills row */
+    e('div', { className: 'mt-10 flex flex-wrap gap-2' },
+      CONFIG.skills.map(s => e('span', { key: s, className: 'text-xs font-medium text-ink bg-white border border-gray-200 rounded-lg px-3 py-1.5' }, s)),
+    ),
+  );
+}
+
+/* ── Project card ── */
+function ProjectCard({ project }) {
+  return e('div', {
+    className: `relative bg-card rounded-2xl border ${project.highlight ? 'border-accent shadow-md' : 'border-gray-200'} p-6 flex flex-col gap-4 hover:shadow-lg transition-shadow duration-200`,
+  },
+    project.highlight && e('span', { className: 'absolute top-4 right-4 text-xs font-semibold text-accent bg-accent-light px-2 py-0.5 rounded-full' }, 'Featured'),
+    e('div', null,
+      e('h3', { className: 'font-display font-bold text-ink text-lg mb-1.5' }, project.name),
+      e('p', { className: 'text-muted text-sm leading-relaxed' }, project.description),
+    ),
+    e('div', { className: 'flex flex-wrap gap-1.5' },
+      project.tags.map(t => e('span', { key: t, className: 'text-xs font-medium text-muted bg-surface border border-gray-100 rounded-md px-2 py-0.5' }, t)),
+    ),
+    e('div', { className: 'flex gap-3 mt-auto pt-2' },
+      project.github && e(ExternalLink, { href: project.github, className: 'text-sm font-semibold text-ink hover:text-accent transition-colors flex items-center gap-1' }, '↗ Code'),
+      project.demo && e(ExternalLink, { href: project.demo, className: 'text-sm font-semibold text-accent hover:text-blue-800 transition-colors flex items-center gap-1' }, '↗ Live demo'),
+    ),
+  );
+}
+
+/* ── Projects section ── */
+function Projects() {
+  const featured = CONFIG.projects.filter(p => p.highlight);
+  const rest = CONFIG.projects.filter(p => !p.highlight);
+  return e('section', { id: 'projects', className: 'py-16 px-6 max-w-4xl mx-auto' },
+    e('h2', { className: 'font-display font-bold text-ink text-2xl mb-8' }, 'Projects'),
+    e('div', { className: 'grid gap-6 sm:grid-cols-2' },
+      [...featured, ...rest].map(p => e(ProjectCard, { key: p.name, project: p })),
+    ),
+  );
+}
+
+/* ── Certificate card ── */
+function CertCard({ cert }) {
+  return e(ExternalLink, { href: cert.link, className: 'block bg-card border border-gray-200 rounded-2xl p-5 hover:border-accent hover:shadow-md transition-all duration-200 group' },
+    e('div', { className: 'flex items-start gap-4' },
+      e('span', { className: 'text-2xl shrink-0', 'aria-hidden': 'true' }, cert.icon || '🏅'),
+      e('div', null,
+        e('p', { className: 'font-semibold text-ink text-sm mb-0.5 group-hover:text-accent transition-colors' }, cert.name),
+        e('p', { className: 'text-xs text-muted' }, cert.issuer),
+        e('p', { className: 'text-xs text-muted mt-1' }, cert.date),
+      ),
+    ),
+    e('p', { className: 'text-xs text-accent font-semibold mt-3 flex items-center gap-1' }, 'View credential ↗'),
+  );
+}
+
+/* ── Certificates section ── */
+function Certificates() {
+  return e('section', { id: 'certificates', className: 'py-16 px-6 max-w-4xl mx-auto' },
+    e('h2', { className: 'font-display font-bold text-ink text-2xl mb-8' }, 'Certificates'),
+    e('div', { className: 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3' },
+      CONFIG.certificates.map(c => e(CertCard, { key: c.name, cert: c })),
+    ),
+  );
+}
+
+/* ── Footer ── */
+function Footer() {
+  return e('footer', { className: 'py-12 px-6 border-t border-gray-100 max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted' },
+    e('p', null, CONFIG.name + ' · ' + CONFIG.location),
+    e('div', { className: 'flex gap-4' },
+      e(ExternalLink, { href: CONFIG.contact.github, className: 'hover:text-ink transition-colors' }, 'GitHub'),
+      e(ExternalLink, { href: CONFIG.contact.linkedin, className: 'hover:text-ink transition-colors' }, 'LinkedIn'),
+      e(ExternalLink, { href: `mailto:${CONFIG.contact.email}`, className: 'hover:text-ink transition-colors' }, 'Email'),
+    ),
+  );
+}
+
+/* ── App ── */
+function App() {
+  return e(React.Fragment, null,
+    e(Nav),
+    e('main', null,
+      e(Hero),
+      e('div', { className: 'border-t border-gray-100' }),
+      e(Projects),
+      e('div', { className: 'border-t border-gray-100' }),
+      e(Certificates),
+    ),
+    e(Footer),
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+</script>
+</body>
+</html>
